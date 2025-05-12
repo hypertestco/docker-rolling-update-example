@@ -59,7 +59,7 @@ app.get('/status', (req, res) => {
     uptime: `${Math.round((Date.now() - APP_START_TIME) / 1000)}s`,
     timestamp: new Date().toISOString()
   };
-  
+
   res.json(statusInfo);
 });
 
@@ -70,16 +70,16 @@ app.get('/health', (req, res) => {
   // Fail health checks for the first 60 seconds after boot
   const uptime = Date.now() - APP_START_TIME;
   if (uptime < STARTUP_GRACE_PERIOD_MS) {
-    console.log(`Health check failed: ${Math.round(uptime/1000)}s uptime, waiting for ${Math.round(STARTUP_GRACE_PERIOD_MS/1000)}s`);
-    return res.status(503).json({ 
-      status: 'initializing', 
-      uptime: `${Math.round(uptime/1000)}s`,
-      ready_in: `${Math.round((STARTUP_GRACE_PERIOD_MS - uptime)/1000)}s`
+    console.log(`Health check failed: ${Math.round(uptime / 1000)}s uptime, waiting for ${Math.round(STARTUP_GRACE_PERIOD_MS / 1000)}s`);
+    return res.status(503).json({
+      status: 'initializing',
+      uptime: `${Math.round(uptime / 1000)}s`,
+      ready_in: `${Math.round((STARTUP_GRACE_PERIOD_MS - uptime) / 1000)}s`
     });
   }
-  
+
   // After grace period, return healthy status
-  res.status(200).json({ status: 'ok', uptime: `${Math.round(uptime/1000)}s` });
+  res.status(200).json({ status: 'ok', uptime: `${Math.round(uptime / 1000)}s` });
 
 });
 
@@ -101,29 +101,35 @@ app.get('/', (req, res) => {
   });
 });
 
-// Start the server
-const server = app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Version: ${getAppVersion()}`);
-  console.log(`Container ID: ${getContainerId()}`);
-});
+// wait for 60 seconds before starting the server
+setTimeout(() => {
+  console.log('Server is starting...');
 
-// Graceful shutdown handling
-function gracefulShutdown(signal) {
-  console.log(`Received ${signal}. Shutting down gracefully...`);
-  
-  server.close(() => {
-    console.log('HTTP server closed.');
-    process.exit(0);
+  // Start the server
+  const server = app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Version: ${getAppVersion()}`);
+    console.log(`Container ID: ${getContainerId()}`);
   });
-  
-  // Force shutdown after timeout
-  setTimeout(() => {
-    console.error('Could not close connections in time, forcefully shutting down');
-    process.exit(1);
-  }, 10000);
-}
 
-// Listen for signals
-process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+  // Graceful shutdown handling
+  function gracefulShutdown(signal) {
+    console.log(`Received ${signal}. Shutting down gracefully...`);
+
+    server.close(() => {
+      console.log('HTTP server closed.');
+      process.exit(0);
+    });
+
+    // Force shutdown after timeout
+    setTimeout(() => {
+      console.error('Could not close connections in time, forcefully shutting down');
+      process.exit(1);
+    }, 10000);
+  }
+
+  // Listen for signals
+  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+  process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+}, STARTUP_GRACE_PERIOD_MS);
+
