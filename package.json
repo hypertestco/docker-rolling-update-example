@@ -1,0 +1,21 @@
+{
+  "name": "docker-demo-app",
+  "version": "1.0.4",
+  "description": "Demo application for Docker rolling updates",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "docker",
+    "rolling-update",
+    "health-check",
+    "container-orchestration"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
