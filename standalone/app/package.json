@@ -1,0 +1,12 @@
+{
+  "name": "simple-node-app",
+  "version": "1.0.0",
+  "description": "A simple Node.js HTTP app for rolling update demo",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {}
+}

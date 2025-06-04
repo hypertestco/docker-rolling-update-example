@@ -1,6 +1,6 @@
 {
   "name": "docker-demo-app",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Demo application for Docker rolling updates",
   "main": "server.js",
   "scripts": {
